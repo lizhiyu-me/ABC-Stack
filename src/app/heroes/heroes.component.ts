@@ -9,26 +9,28 @@ import { MessageService } from '../messages.service';
   styleUrls: ['./heroes.component.scss']
 })
 export class HeroesComponent implements OnInit {
+  heroes: Hero[] = [];
 
-  constructor(private heroesService:HeroService,public messageService: MessageService) { }
-  hero:Hero = {
-    id:1,
-    name:"士大夫山豆根ThunderGod"
-  };
-  heroes:Hero[] = [];
+  constructor(private heroService: HeroService) { }
+
   ngOnInit(): void {
-    // this.heroes = this.getHeroes();
     this.getHeroes();
   }
 
-  getHeroes(){
-    this.heroesService.getHeroes().subscribe((heroes)=>this.heroes = heroes);
+  getHeroes(): void {
+    this.heroService.getHeroes()
+    .subscribe(heroes => this.heroes = heroes);
   }
-
-  selectedHero?:Hero;
-  onSelect(hero:Hero){
-    this.selectedHero = hero;
-    this.messageService.add(`HeroesComponent: Selected hero id:${hero.id}`)
+  add(name: string): void {
+    name = name.trim();
+    if (!name) { return; }
+    this.heroService.addHero({ name } as Hero)
+      .subscribe(hero => {
+        this.heroes.push(hero);
+      });
   }
-
+  delete(hero: Hero): void {
+    this.heroes = this.heroes.filter(h => h !== hero);
+    this.heroService.deleteHero(hero.id).subscribe();
+  }
 }
